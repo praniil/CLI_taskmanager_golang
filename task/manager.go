@@ -1,5 +1,7 @@
 package task
 
+import "fmt"
+
 type ManagerStruct struct {
 	tasks    []*TaskStruct
 	taskChan chan string
@@ -8,23 +10,27 @@ type ManagerStruct struct {
 
 func NewMananger(taskChan chan string, done chan bool) *ManagerStruct {
 	return &ManagerStruct{
-		tasks: []*TaskStruct{},
+		tasks:    []*TaskStruct{},
 		taskChan: taskChan,
-		done: done,
+		done:     done,
 	}
 }
 
-func (m *ManagerStruct) AddTask (description string) {
+func (m *ManagerStruct) AddTask(description string) {
 	m.tasks = append(m.tasks, NewTask(description))
+	fmt.Println(m.tasks)
 }
 
 func (m *ManagerStruct) ListernForTasks() {
-	for{
-		select{
+	for {
+		select {
 		case description := <-m.taskChan:
 			m.AddTask(description)
-		case <- m.done:
-			return	
+		case <-m.done:
+			return
 		}
 	}
+}
+func (m *ManagerStruct) DisplayList() []*TaskStruct{
+	return m.tasks
 }
