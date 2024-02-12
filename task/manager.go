@@ -1,6 +1,9 @@
 package task
 
-import "fmt"
+import (
+	"fmt"
+	"CLI_taskmanager/database"
+)
 
 type ManagerStruct struct {
 	tasks    []*TaskStruct
@@ -18,6 +21,7 @@ func NewMananger(taskChan chan string, done chan bool) *ManagerStruct {
 
 func (m *ManagerStruct) AddTask(description string) {
 	m.tasks = append(m.tasks, NewTask(description))
+	
 	fmt.Println(m.tasks)
 }
 
