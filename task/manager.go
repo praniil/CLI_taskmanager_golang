@@ -1,8 +1,8 @@
 package task
 
 import (
-	"fmt"
 	"CLI_taskmanager/database"
+	"fmt"
 )
 
 type ManagerStruct struct {
@@ -20,8 +20,16 @@ func NewMananger(taskChan chan string, done chan bool) *ManagerStruct {
 }
 
 func (m *ManagerStruct) AddTask(description string) {
+	db := database.Database_connection()
 	m.tasks = append(m.tasks, NewTask(description))
-	
+	db.AutoMigrate(&TaskStruct{})
+	task := *&TaskStruct{
+		Description: description,
+	}
+	result := db.Create(task)
+	if result.Error != nil {
+		fmt.Println("failed to create a task or add task in the database")
+	}
 	fmt.Println(m.tasks)
 }
 
@@ -35,6 +43,6 @@ func (m *ManagerStruct) ListernForTasks() {
 		}
 	}
 }
-func (m *ManagerStruct) DisplayList() []*TaskStruct{
+func (m *ManagerStruct) DisplayList() []*TaskStruct {
 	return m.tasks
 }
