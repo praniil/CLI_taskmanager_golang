@@ -2,18 +2,19 @@ package task
 
 import (
 	"CLI_taskmanager/database"
+	// "gorm.io/driver/postgres"
 	"fmt"
 )
 
 type ManagerStruct struct {
-	tasks    []*TaskStruct
+	tasks    []*Task
 	taskChan chan string
 	done     chan bool
 }
 
 func NewMananger(taskChan chan string, done chan bool) *ManagerStruct {
 	return &ManagerStruct{
-		tasks:    []*TaskStruct{},
+		tasks:    []*Task{},
 		taskChan: taskChan,
 		done:     done,
 	}
@@ -21,9 +22,9 @@ func NewMananger(taskChan chan string, done chan bool) *ManagerStruct {
 
 func (m *ManagerStruct) AddTask(description string) {
 	db := database.Database_connection()
+	db.AutoMigrate(&Task{})
 	m.tasks = append(m.tasks, NewTask(description))
-	db.AutoMigrate(&TaskStruct{})
-	task := *&TaskStruct{
+	task := &Task{
 		Description: description,
 	}
 	result := db.Create(task)
@@ -31,6 +32,19 @@ func (m *ManagerStruct) AddTask(description string) {
 		fmt.Println("failed to create a task or add task in the database")
 	}
 	fmt.Println(m.tasks)
+}
+
+func (m *ManagerStruct) DeleteTask() {
+	fmt.Println("Enter the id you want to delete: ")
+	var delete int
+	fmt.Scanf("%d", &delete)
+	db := database.Database_connection()
+	result := db.Delete(&Task{}, delete)
+	if result.Error != nil {
+		fmt.Println("failed to delete the record: ", result.Error)
+	}
+	rowsDeleted := result.RowsAffected
+	fmt.Printf("no of rows deleted: %d", rowsDeleted)
 }
 
 func (m *ManagerStruct) ListernForTasks() {
@@ -43,6 +57,6 @@ func (m *ManagerStruct) ListernForTasks() {
 		}
 	}
 }
-func (m *ManagerStruct) DisplayList() []*TaskStruct {
+func (m *ManagerStruct) DisplayList() []*Task {
 	return m.tasks
 }

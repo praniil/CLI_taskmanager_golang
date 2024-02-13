@@ -2,7 +2,7 @@ package main
 
 import (
 	"CLI_taskmanager/database"
-	taskmanager "CLI_taskmanager/task"
+	"CLI_taskmanager/task"
 	"bufio"
 	"fmt"
 
@@ -10,6 +10,15 @@ import (
 	"os"
 	"os/signal"
 )
+
+func inputTasks() string {
+	fmt.Println("input tasks: ")
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	description := scanner.Text()
+
+	return description
+}
 
 func main() {
 	db := database.Database_connection()
@@ -23,18 +32,29 @@ func main() {
 		defer sqlDB.Close()
 		fmt.Println("Database connection closed")
 	}()
-	
+
 	taskChan := make(chan string, 1)
 	done := make(chan bool, 1)
-	taskManager := taskmanager.NewMananger(taskChan, done)
+	taskManager := task.NewMananger(taskChan, done)
 	taskManager.DisplayList()
 	go func() {
-		for {
-			fmt.Println("input tasks: ")
-			scanner := bufio.NewScanner(os.Stdin)
-			scanner.Scan()
-			description := scanner.Text()
-			taskChan <- description
+		var continuee int
+		continuee = 1
+		for continuee == 1 {
+			fmt.Println("Enter 1 for input of task and 2 for the deletion of task")
+			var choose int
+			fmt.Scanf("%d", &choose)
+			switch choose {
+			case 1:
+				taskChan <- inputTasks()
+				break
+
+			case 2:
+				taskManager.DeleteTask()
+				break
+			default:
+				fmt.Println("wrong choice please try it again")
+			}
 		}
 	}()
 
