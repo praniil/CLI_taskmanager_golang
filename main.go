@@ -2,7 +2,7 @@ package main
 
 import (
 	"CLI_taskmanager/database"
-	"CLI_taskmanager/task"
+	tm "CLI_taskmanager/task"
 	"bufio"
 	"fmt"
 
@@ -35,13 +35,13 @@ func main() {
 
 	taskChan := make(chan string, 1)
 	done := make(chan bool, 1)
-	taskManager := task.NewMananger(taskChan, done)
+	taskManager := tm.NewMananger(taskChan, done)
 	taskManager.DisplayList()
 	go func() {
 		var continuee int
 		continuee = 1
 		for continuee == 1 {
-			fmt.Println("Enter 1 for input of task and 2 for the deletion of task")
+			fmt.Printf("Select\n 1. for input of task\n 2. for the deletion of task\n 3. for updating the task\n")
 			var choose int
 			fmt.Scanf("%d", &choose)
 			switch choose {
@@ -51,6 +51,10 @@ func main() {
 
 			case 2:
 				taskManager.DeleteTask()
+				break
+
+			case 3:
+				tm.UpdateTask()
 				break
 			default:
 				fmt.Println("wrong choice please try it again")

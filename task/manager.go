@@ -3,7 +3,9 @@ package task
 import (
 	"CLI_taskmanager/database"
 	// "gorm.io/driver/postgres"
+	"bufio"
 	"fmt"
+	"os"
 )
 
 type ManagerStruct struct {
@@ -44,7 +46,22 @@ func (m *ManagerStruct) DeleteTask() {
 		fmt.Println("failed to delete the record: ", result.Error)
 	}
 	rowsDeleted := result.RowsAffected
-	fmt.Printf("no of rows deleted: %d", rowsDeleted)
+	fmt.Printf("no of rows deleted: %d \n", rowsDeleted)
+}
+
+func UpdateTask() {
+	db := database.Database_connection()
+	fmt.Printf("Enter the id you want to update: ")
+	var id int
+	fmt.Scanf("%d", &id)
+	fmt.Println("input tasks: ")
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	description := scanner.Text()
+	result := db.Model(&Task{}).Where("id =?", id).Update("Description", description)
+	rowsUpdated := result.RowsAffected
+	fmt.Printf("no of rows updated: %d\n", rowsUpdated)
+
 }
 
 func (m *ManagerStruct) ListernForTasks() {
