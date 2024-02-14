@@ -33,7 +33,12 @@ func (m *ManagerStruct) AddTask(description string) {
 	if result.Error != nil {
 		fmt.Println("failed to create a task or add task in the database")
 	}
-	fmt.Println(m.tasks)
+	var taskInfo []*Task
+	reslt := db.Find(&taskInfo)
+	if reslt.Error != nil {
+		fmt.Println("couldnot get the record from the database", reslt.Error)
+	}
+	fmt.Println(taskInfo)
 }
 
 func (m *ManagerStruct) DeleteTask() {
@@ -47,6 +52,12 @@ func (m *ManagerStruct) DeleteTask() {
 	}
 	rowsDeleted := result.RowsAffected
 	fmt.Printf("no of rows deleted: %d \n", rowsDeleted)
+	var taskInfo []*Task
+	reslt := db.Find(&taskInfo)
+	if reslt.Error != nil {
+		fmt.Println("couldnot get the record from the database", reslt.Error)
+	}
+	fmt.Println(taskInfo)
 }
 
 func UpdateTask() {
